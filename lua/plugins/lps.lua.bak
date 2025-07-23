@@ -1,0 +1,48 @@
+return {
+  "neovim/nvim-lspconfig",
+  dependencies = {
+    "williamboman/mason.nvim",
+    -- "folke/neodev.nvim", -- opcional si prefieres usar neodev
+    "folke/lazydev.nvim",
+    "hrsh7th/nvim-cmp", -- necesario para capabilities
+    "hrsh7th/cmp-nvim-lsp",
+  },
+  config = function()
+    -- Activar lazydev (asume que estás trabajando con Lua)
+    require("lazydev").setup({})
+
+    -- Capabilities para nvim-cmp + LSP
+    local capabilities = vim.lsp.protocol.make_client_capabilities()
+    capabilities = require("cmp_nvim_lsp").default_capabilities(capabilities)
+
+    -- Keymaps al conectar el servidor
+    local on_attach = function(_, bufnr)
+      vim.bo[bufnr].omnifunc = 'v.lua.vim.lsp.omnifunc'
+      -- Hover (K)
+      vim.keymap.set("n", "K", vim.lsp.buf.hover, { buffer = bufnr })
+      vim.keymap.set('n', '<space>q', vim.diagnostic.setloclist)
+
+      -- Diagnóstico flotante
+    end
+
+    -- Configurar lua_ls
+    require("lspconfig").lua_ls.setup({
+      on_attach = on_attach,
+      capabilities = capabilities,
+      settings = {
+        Lua = {
+          telemetry = { enable = false },
+          workspace = { checkThirdParty = false },
+        },
+      },
+    })
+
+    -- Configuración visual de diagnósticos (opcional)
+    vim.diagnostic.config({
+      virtual_text = true,
+      float = {
+        border = "rounded",
+      },
+    })
+  end,
+}
