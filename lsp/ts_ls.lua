@@ -61,8 +61,8 @@ return {
 
       vim.lsp.buf.code_action({
         context = {
-          only = source_actions,
-        },
+          only = source_actions
+        }
       })
     end, {})
   end,
